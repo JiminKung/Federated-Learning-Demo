@@ -18,6 +18,7 @@ def compute_moments(features, input_channels=3):
     stddevs = list(map(lambda i: np.float32(i / 255), stddevs))
     return means, stddevs
 
+
 def normalize(features):
     """
     Normalizes data using means and stddevs
@@ -32,6 +33,7 @@ def load_cifar10():
     # features_train, labels_train = features_train[:100], labels_train[:100]
     # features_test, labels_test = features_test[:20], labels_test[:20]
     return features_train, labels_train, features_test, labels_test
+
 
 class BatchGenerator:
     def __init__(self, x, yy):
@@ -48,6 +50,7 @@ class Dataset(object):
     """
     Load the dataset from a specific file.
     """
+
     def __init__(self, classes_num, split, one_hot):
         features_train, labels_train, features_test, labels_test = load_cifar10()
         # Normalize the train features and test features.
@@ -75,7 +78,7 @@ class Dataset(object):
         if split == 0 or split == 1:
             return [BatchGenerator(x_data, y_data)]
         res = []
-        for x ,y in zip(np.split(x_data,split), np.split(y_data,split)):
+        for x, y in zip(np.split(x_data, split), np.split(y_data, split)):
             assert len(x) == len(y), "Features can't match to labels, since they are in different size!"
             res.append(BatchGenerator(x, y))
         return res

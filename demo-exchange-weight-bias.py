@@ -11,13 +11,13 @@ if __name__ == "__main__":
     CLIENT_RATIO_PER_ROUND = 1.00
     # Some characteristics of the dataset cifar-10.
     input_shape = (32, 32, 3)
-    classes_num = 10    # cifar-10
+    classes_num = 10  # cifar-10
 
     """Build clients, server."""
     client = Clients(input_shape=input_shape,
-                    classes_num=classes_num,
-                    learning_rate=learning_rate,
-                    clients_num=CLIENT_NUMBER)
+                     classes_num=classes_num,
+                     learning_rate=learning_rate,
+                     clients_num=CLIENT_NUMBER)
     server = Server()
 
     """Begin training."""

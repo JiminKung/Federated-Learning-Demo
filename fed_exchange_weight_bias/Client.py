@@ -3,12 +3,12 @@ import math
 
 import tensorflow as tf
 
-from fed_ml.Dataset import Dataset
-from fed_ml.Model import alexnet, scheduler
+from fed_exchange_weight_bias.Dataset import Dataset
+from fed_exchange_weight_bias.Model import alexnet, scheduler
 
 
 class Clients:
-    def __init__(self, input_shape, classes_num, learning_rate, clients_num, dataset_path):
+    def __init__(self, input_shape, classes_num, learning_rate, clients_num):
         self.current_cid = -1
         self.input_shape = input_shape
         self.learning_rate = learning_rate
@@ -18,12 +18,11 @@ class Clients:
         # Compile the model.
         self.opt = tf.compat.v1.keras.optimizers.Adam(learning_rate=self.learning_rate)
         self.model.compile(loss='categorical_crossentropy',
-                            optimizer=self.opt,
-                            metrics=['accuracy'])
+                           optimizer=self.opt,
+                           metrics=['accuracy'])
         self.dataset = Dataset(classes_num=classes_num,
                                split=clients_num,
                                one_hot=True)
-
 
     def train_local_model(self):
         """
@@ -46,15 +45,13 @@ class Clients:
 
         # Train the keras model with method `fit`.
         self.model.fit(features_train, labels_train,
-                        batch_size=32, epochs=15,
-                        validation_data=(features_test, labels_test),
-                        shuffle=True, callbacks=[callback])
-
+                       batch_size=32, epochs=15,
+                       validation_data=(features_test, labels_test),
+                       shuffle=True, callbacks=[callback])
 
     def upload_local_parameters(self):
         """ Return all of the variables list"""
         return self.model.trainable_variables
-
 
     def download_global_parameters(self, global_vars):
         """ Assign all of the variables with global vars """
@@ -70,7 +67,6 @@ class Clients:
         for var, value in zip(client_vars, global_vars):
             var.assign(value)
 
-
     def choose_clients(self, ratio=1.0):
         """ Randomly choose some clients """
         client_num = self.get_clients_num()
@@ -78,7 +74,6 @@ class Clients:
         choose_num = math.ceil(client_num * ratio)  # To ensure all participants can be covered if necessary.
         # return np.random.permutation(client_num)[:choose_num]
         return list(range(choose_num))
-
 
     def get_clients_num(self):
         return len(self.dataset.train)
