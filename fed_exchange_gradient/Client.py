@@ -34,7 +34,6 @@ class Clients:
         size = len(dataset_train.x)
         # features_train, labels_train = dataset_train.x[:int(0.8*size)], dataset_train.y[:int(0.8*size)]
         # features_test, labels_test = dataset_train.x[int(0.8*size):], dataset_train.y[int(0.8*size):]
-
         features_train, labels_train = dataset_train.x, dataset_train.y
         features_test, labels_test = dataset_test.x[:size], dataset_test.y[:size]
 
