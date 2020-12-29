@@ -20,9 +20,9 @@ class Clients:
         self.model.compile(loss='categorical_crossentropy',
                             optimizer=self.opt,
                             metrics=['accuracy'])
-        self.dataset = Dataset(dataset_path, split=clients_num,
-                               one_hot=True, input_shape=self.input_shape,
-                               classes_num=classes_num)
+        self.dataset = Dataset(classes_num=classes_num,
+                               split=clients_num,
+                               one_hot=True)
 
 
     def train_local_model(self):
