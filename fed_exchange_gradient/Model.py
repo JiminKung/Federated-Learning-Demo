@@ -164,6 +164,14 @@ if __name__ == '__main__':
         loss = CrossEntropyLoss(logits, tf.reshape(labels_train, [-1]))
         loss = tf.reduce_mean(loss)
     vars = alexnet_model.trainable_variables
+
+    new_optimizer = keras.optimizers.Adam(learning_rate=0.0001)
+    new_model = alexnet(input_shape, classes_num)
+    new_model.compile(loss='categorical_crossentropy',
+                          optimizer=new_optimizer,
+                          metrics=['accuracy'])
+    new_vars = new_model.trainable_variables
+
     grads = tape.gradient(loss, vars)
     optimizer.apply_gradients(zip(grads, vars))
 
