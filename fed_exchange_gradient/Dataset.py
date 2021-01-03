@@ -73,6 +73,7 @@ class Dataset(object):
         # Create the testing batch.
         self.test = BatchGenerator(features_test, labels_test)
 
+
     def splited_batch(self, x_data, y_data, split):
         """Assume that the data set held by each participant is equally sized."""
         if split == 0 or split == 1:
