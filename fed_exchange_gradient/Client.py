@@ -2,8 +2,8 @@ import math
 import copy
 import tensorflow as tf
 
-from fed_exchange_weight_bias.Dataset import Dataset
-from fed_exchange_weight_bias.Model import alexnet, scheduler
+from fed_exchange_weight_bias.utils.Dataset import Dataset
+from fed_exchange_weight_bias.utils.Model import alexnet
 
 
 class Clients:

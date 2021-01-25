@@ -1,6 +1,4 @@
-"""Server"""
 import copy
-import numpy as np
 
 
 class Server:

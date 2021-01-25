@@ -1,8 +1,11 @@
 import math
 import tensorflow as tf
+from contextlib import redirect_stdout
 
-from fed_exchange_weight_bias.Dataset import Dataset
-from fed_exchange_weight_bias.Model import alexnet, scheduler
+
+from fed_exchange_weight_bias.utils.Model import *
+from fed_exchange_weight_bias.utils.Dataset import *
+from fed_exchange_weight_bias.utils.logger import *
 
 
 class Clients:
@@ -25,6 +28,28 @@ class Clients:
         self.current_cid = -1
         self.isolated_cid = -1
         self.isolated_local_parameters = None
+
+        self.logger = create_client_logger()
+        self.log_info()
+
+    def log_info(self):
+        self.logger.info("dataset: {}, "
+                         "input shape: {}, "
+                         "classes number: {}".format("cifar-10", self.input_shape, self.classes_num))
+
+        self.logger.info("participants number: {}, "
+                         "training set per participant: {}, "
+                         "testing set per participant: {}".format(self.clients_num,
+                                                                  len(self.dataset.train[0].x),
+                                                                  len(self.dataset.test.x)))
+
+        self.logger.info("model architecture: {}, learning rate: {}".format("AlexNet", self.learning_rate))
+
+        filename = self.logger.root.handlers[0].baseFilename
+        self.logger.info("model details: ")
+        with open(filename, "a") as f:
+            with redirect_stdout(f):
+                self.model.summary()
 
     def train_local_model(self, batch_size=32, local_epochs=15):
         """

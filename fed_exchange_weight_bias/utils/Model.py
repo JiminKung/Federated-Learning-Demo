@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 
-keras = tf.compat.v1.keras
 keraslayers = tf.compat.v1.keras.layers
 
 
@@ -13,7 +12,7 @@ def alexnet(input_shape, classes_num=100):
     github.com/akrizhevsky/cuda-convnet2/blob/master/layers/
     """
     # Creating initializer, optimizer and the regularizer ops
-    initializer = tf.compat.v1.keras.initializers.random_normal(0.0, 0.01)
+    initializer = tf.compat.v1.keras.initializers.random_normal(0.0, 0.01, dtype=tf.float32)
     regularizer = tf.compat.v1.keras.regularizers.l2(5e-4)
 
     inputshape = (input_shape[0], input_shape[1], input_shape[2],)
