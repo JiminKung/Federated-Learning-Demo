@@ -3,8 +3,8 @@ import tensorflow as tf
 from contextlib import redirect_stdout
 
 
-from fed_exchange_weight_bias.utils.Model import *
-from fed_exchange_weight_bias.utils.Dataset import *
+from fed_exchange_weight_bias.utils.model import *
+from fed_exchange_weight_bias.utils.dataset import *
 from fed_exchange_weight_bias.utils.logger import *
 
 
@@ -71,10 +71,12 @@ class Clients:
         callback = tf.compat.v1.keras.callbacks.LearningRateScheduler(scheduler)
 
         # Train the keras model with method `fit`.
-        self.model.fit(features_train, labels_train,
-                       batch_size=batch_size, epochs=local_epochs,
-                       validation_data=(features_test, labels_test),
-                       shuffle=True, callbacks=[callback])
+        history_callback = self.model.fit(features_train, labels_train,
+                                          batch_size=batch_size, epochs=local_epochs,
+                                          validation_data=(features_test, labels_test),
+                                          shuffle=True, callbacks=[callback])
+
+        log_history(self.logger, history_callback)
 
     def upload_local_parameters(self):
         """ Return all of the variables list"""

@@ -3,3 +3,5 @@ __pycache__
 #demo
 #membership_inference_attack
 #fed_ml
+logs
+*.log

@@ -1,5 +1,6 @@
-from fed_exchange_weight_bias.Client import Clients
-from fed_exchange_weight_bias.Server import Server
+from fed_exchange_weight_bias.client import Clients
+from fed_exchange_weight_bias.server import Server
+from fed_exchange_weight_bias.utils.logger import initialize_logging, create_federated_logger
 
 if __name__ == "__main__":
     """Set hyper-parameters."""
@@ -12,6 +13,10 @@ if __name__ == "__main__":
     # Some characteristics of the dataset cifar-10.
     input_shape = (32, 32, 3)
     classes_num = 10  # cifar-10
+
+    """initialize logger"""
+    initialize_logging(filepath="logs/", filename="federated_learning.log")
+    federated_logger = create_federated_logger("federated learning")
 
     """Build clients, server."""
     client = Clients(input_shape=input_shape,
@@ -30,6 +35,7 @@ if __name__ == "__main__":
         for client_id in active_clients:
             client.current_cid = client_id
             print("[fed-epoch {}] cid: {}".format(ep, client_id))
+            federated_logger.info("[fed-epoch {}] cid: {}".format(ep, client_id))
             client.download_global_parameters(server.global_parameters)
             client.train_local_model()
             # Accumulate local parameters.

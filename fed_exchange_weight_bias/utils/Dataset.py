@@ -30,8 +30,8 @@ def normalize(features):
 
 def load_cifar10():
     (features_train, labels_train), (features_test, labels_test) = tf.compat.v1.keras.datasets.cifar10.load_data()
-    features_train, labels_train = features_train[:100], labels_train[:100]
-    features_test, labels_test = features_test[:20], labels_test[:20]
+    features_train, labels_train = features_train[:1000], labels_train[:1000]
+    features_test, labels_test = features_test[:200], labels_test[:200]
     return features_train, labels_train, features_test, labels_test
 
 
