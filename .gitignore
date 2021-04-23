@@ -1,7 +1,8 @@
-.idea
+/.idea
 __pycache__
 #demo
 #membership_inference_attack
 #fed_ml
-logs
+/logs
 *.log
+/data

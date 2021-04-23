@@ -1,27 +1,29 @@
 import math
-import tensorflow as tf
 from contextlib import redirect_stdout
 
+import tensorflow as tf
 
-from fed_exchange_weight_bias.utils.model import *
-from fed_exchange_weight_bias.utils.dataset import *
-from fed_exchange_weight_bias.utils.logger import *
+from fed_exchange_weight_bias.utils.dataset import Dataset
+from fed_exchange_weight_bias.utils.logger import create_client_logger, log_history
+from fed_exchange_weight_bias.utils.model import scheduler, create_model
 
 
 class Clients:
-    def __init__(self, input_shape, classes_num, learning_rate, clients_num):
+    def __init__(self, input_shape, classes_num, learning_rate, clients_num, dataset="cifar10", model_name="alexnet"):
         self.input_shape = input_shape
         self.learning_rate = learning_rate
         self.classes_num = classes_num
         self.clients_num = clients_num
         # Initialize the Keras model.
-        self.model = alexnet(self.input_shape, classes_num=classes_num)
+        self.model_name = model_name
+        self.model = create_model(model_name=self.model_name, input_shape=self.input_shape, classes_num=classes_num)
         # Compile the model.
         self.opt = tf.compat.v1.keras.optimizers.Adam(learning_rate=self.learning_rate)
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=self.opt,
                            metrics=['accuracy'])
-        self.dataset = Dataset(classes_num=classes_num,
+        self.dataset = Dataset(dataset=dataset,
+                               classes_num=classes_num,
                                split=clients_num,
                                one_hot=True)
 
@@ -51,29 +53,26 @@ class Clients:
             with redirect_stdout(f):
                 self.model.summary()
 
-    def train_local_model(self, batch_size=32, local_epochs=15):
+    def train_local_model(self, train_ratio=0.8, batch_size=32, local_epochs=15):
         """
         Train one client with its own data for one fed-epoch.
         """
         # The data held by each participant should be divided into tow parts:
         # train set and test set, both of which are used to train the local model.
         assert self.current_cid != -1, "Forget to register the current cid during federated training!"
-        dataset_train = self.dataset.train[self.current_cid]
-        dataset_test = self.dataset.test
-        size = len(dataset_train.x)
-        # features_train, labels_train = dataset_train.x[:int(0.8*size)], dataset_train.y[:int(0.8*size)]
-        # features_test, labels_test = dataset_train.x[int(0.8*size):], dataset_train.y[int(0.8*size):]
 
-        features_train, labels_train = dataset_train.x, dataset_train.y
-        features_test, labels_test = dataset_test.x[:size], dataset_test.y[:size]
+        local_dataset = self.dataset.train[self.current_cid]
+        train_size = int(train_ratio * len(local_dataset.x))
+        train_features, train_labels = local_dataset.x[: train_size], local_dataset.y[: train_size]
+        valid_features, valid_labels = local_dataset.x[train_size:], local_dataset.y[train_size:]
 
         # Define the callback method.
         callback = tf.compat.v1.keras.callbacks.LearningRateScheduler(scheduler)
 
         # Train the keras model with method `fit`.
-        history_callback = self.model.fit(features_train, labels_train,
+        history_callback = self.model.fit(train_features, train_labels,
                                           batch_size=batch_size, epochs=local_epochs,
-                                          validation_data=(features_test, labels_test),
+                                          validation_data=(valid_features, valid_labels),
                                           shuffle=True, callbacks=[callback])
 
         log_history(self.logger, history_callback)
@@ -97,7 +96,9 @@ class Clients:
 
         if global_vars is None:
             # Clear the parameters.
-            self.model = alexnet(self.input_shape, classes_num=self.classes_num)
+            self.model = create_model(model_name=self.model_name,
+                                      input_shape=self.input_shape,
+                                      classes_num=self.classes_num)
             self.model.compile(loss='categorical_crossentropy',
                                optimizer=self.opt,
                                metrics=['accuracy'])

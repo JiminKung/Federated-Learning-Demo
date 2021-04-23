@@ -1,0 +1,27 @@
+project:
+  name: federated learning demo
+  author: JiminKung
+
+# participants
+learning_rate: 0.0001
+train_ratio: 0.8
+fed_epochs: 5
+batch_size: 32
+local_epochs: 10
+clients_num: 4
+client_ratio_per_round: 1.00
+
+model: ["alexnet", "vgg16", "vgg19"]
+
+# dataset
+cifar10:
+  input_shape: [32, 32, 3]
+  classes_num: 10
+
+cifar100:
+  input_shape: [32, 32, 3]
+  classes_num: 100
+
+cars:
+  input_shape: [224, 224, 3]
+  classes_num: 196
